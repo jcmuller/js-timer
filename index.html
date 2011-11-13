@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Raphaël · Polar Timer</title>
+    <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
+    <link type="text/css" rel="stylesheet" href="http://jqueryui.com/themeroller/css/parseTheme.css.php?ffDefault=Trebuchet+MS,+Tahoma,+Verdana,+Arial,+sans-serif&amp;fwDefault=bold&amp;fsDefault=1.1em&amp;cornerRadius=4px&amp;bgColorHeader=f6a828&amp;bgTextureHeader=12_gloss_wave.png&amp;bgImgOpacityHeader=35&amp;borderColorHeader=e78f08&amp;fcHeader=ffffff&amp;iconColorHeader=ffffff&amp;bgColorContent=eeeeee&amp;bgTextureContent=03_highlight_soft.png&amp;bgImgOpacityContent=100&amp;borderColorContent=dddddd&amp;fcContent=333333&amp;iconColorContent=222222&amp;bgColorDefault=f6f6f6&amp;bgTextureDefault=02_glass.png&amp;bgImgOpacityDefault=100&amp;borderColorDefault=cccccc&amp;fcDefault=1c94c4&amp;iconColorDefault=ef8c08&amp;bgColorHover=fdf5ce&amp;bgTextureHover=02_glass.png&amp;bgImgOpacityHover=100&amp;borderColorHover=fbcb09&amp;fcHover=c77405&amp;iconColorHover=ef8c08&amp;bgColorActive=ffffff&amp;bgTextureActive=02_glass.png&amp;bgImgOpacityActive=65&amp;borderColorActive=fbd850&amp;fcActive=eb8f00&amp;iconColorActive=ef8c08&amp;bgColorHighlight=ffe45c&amp;bgTextureHighlight=03_highlight_soft.png&amp;bgImgOpacityHighlight=75&amp;borderColorHighlight=fed22f&amp;fcHighlight=363636&amp;iconColorHighlight=228ef1&amp;bgColorError=b81900&amp;bgTextureError=08_diagonals_thick.png&amp;bgImgOpacityError=18&amp;borderColorError=cd0a0a&amp;fcError=ffffff&amp;iconColorError=ffd27a&amp;bgColorOverlay=666666&amp;bgTextureOverlay=08_diagonals_thick.png&amp;bgImgOpacityOverlay=20&amp;opacityOverlay=50&amp;bgColorShadow=000000&amp;bgTextureShadow=01_flat.png&amp;bgImgOpacityShadow=10&amp;opacityShadow=20&amp;thicknessShadow=5px&amp;offsetTopShadow=-5px&amp;offsetLeftShadow=-5px&amp;cornerRadiusShadow=5px" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://raphaeljs.com/raphael.js"></script>
+    <script type="text/javascript" src="http://cdn.jquerytools.org/1.2.6/jquery.tools.min.js"></script>
+    <script type="text/javascript" src="lib/jquery-ui-1.8.16.custom.js"></script>
+    <script type="text/javascript" src="lib/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="lib/date-format.js"></script>
+
+    <script type="text/javascript" src="lib/timer.js"></script>
+    <style media="screen" type="text/css">
+      body {
+        background: #333;
+        color: #fff;
+        font-family: "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
+      }
+
+      #holder {
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        height: 600px;
+        margin: -300px 0 0 -300px;
+        width: 600px;
+      }
+
+      #time {
+        text-align: center;
+        font: 100 3em "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      #setup a {
+        color: #ccc;
+        text-decoration: none;
+        bottom: 10px;
+        cursor: pointer;
+        position: absolute;
+        left: 10px;
+        text-align: left;
+      }
+
+      #setTime {
+        color: #ccc;
+        text-decoration: none;
+        bottom: 10px;
+        position: absolute;
+        right: 10px;
+        text-align: right;
+      }
+
+      /* css for timepicker */
+      .ui-timepicker-div .ui-widget-header{ margin-bottom: 8px; }
+      .ui-timepicker-div dl{ text-align: left; }
+      .ui-timepicker-div dl dt{ height: 25px; }
+      .ui-timepicker-div dl dd{ margin: -25px 0 10px 65px; }
+      .ui-timepicker-div td { font-size: 90%; }
+
+      .simple_overlay {
+        /* must be initially hidden */
+        display:none;
+        /* place overlay on top of other elements */
+        z-index:10000;
+        /* styling */
+        background-color:#333;
+        width:675px;
+        min-height:200px;
+        border:1px solid #666;
+        /* CSS3 styling for latest browsers */
+        -moz-box-shadow:0 0 90px 5px #000;
+        -webkit-box-shadow: 0 0 90px #000;
+      }
+
+      /* close button positioned on upper right corner */
+      .simple_overlay .close {
+        background-image:url("images/close.png");
+        position:absolute;
+        right:-15px;
+        top:-15px;
+        cursor:pointer;
+        height:35px;
+        width:35px;
+      }
+
+      /* styling for elements inside overlay */
+      .details {
+        position:absolute;
+        top:15px;
+        right:15px;
+        font-size:11px;
+        color:#fff;
+        width:150px;
+      }
+
+      .details h3 {
+        color:#aba;
+        font-size:15px;
+        margin:0 0 -10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="holder"></div>
+    <div id="time">
+      <span id="d"></span>d<span id="h"></span>h<span id="m"></span>m<span id="s"></span>s
+    </div>
+    <div id="setup">
+      <input type="hidden" id="epoch" onchange="pullDate(this);">
+      <a rel="#settings">set up</a>
+    </div>
+    <div id="setTime"></div>
+
+    <div class="simple_overlay" id="settings">
+      <p>Date: <input type="text" id="datepicker"></p>
+      <p>Text: <input type="text" id="textWhenEnds" size="80"></p>
+    </div>
+  </body>
+</html>
+
